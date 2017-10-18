@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="suggest">
+
+	<typeAlias alias="Suggest" type="kr.co.jtimes.news.vo.TbSuggestVo"/>
+	
+	<insert id="addSuggest" parameterClass="Suggest">
+		insert into tb_suggest
+		(news_no, user_no)
+		values 
+		(#tbNewsVo.newsNo#, #userNo.no#)
+	</insert>
+	
+	<select id="getSuggests" parameterClass="int" resultClass="int">
+		select count(*)
+		from tb_suggest
+		where news_no =#tbNewsVo.newsNo#
+	</select>
+	
+</sqlMap>

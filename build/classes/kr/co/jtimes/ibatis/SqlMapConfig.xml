@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+  <transactionManager type="JDBC" commitRequired="false">
+    <dataSource type="SIMPLE">
+      <property name="JDBC.Driver" value="oracle.jdbc.OracleDriver"/>
+      <property name="JDBC.ConnectionURL" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+      <property name="JDBC.Username" value="jtimes"/>
+      <property name="JDBC.Password" value="zxcv1234"/>
+    </dataSource>
+  </transactionManager>
+
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/reporter/news/news.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/reporter/profile/reporter.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/reporter/img/tbimages.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user/suggest/suggest.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user/comments/comments.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user/like/commentLike.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user/citizenrep/citizenrep.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/user/citizenrep/crcomments.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/reporter/sign/sign.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/ad/ad.xml"/>
+  <sqlMap resource="kr/co/jtimes/ibatis/mappers/common/common.xml"/>
+
+</sqlMapConfig>

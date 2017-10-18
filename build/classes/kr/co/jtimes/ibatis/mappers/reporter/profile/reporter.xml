@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="reporter">
+	<typeAlias alias="ReporterEmployeeVo" type="kr.co.jtimes.reporter.profile.common.vo.ReporterEmployeeVo"/>
+
+	<select id="getReporterAll" parameterClass="kr.co.jtimes.common.criteria.ReporterCriteria" resultClass="ReporterEmployeeVo">
+		<![CDATA[
+		select
+			*
+		from (select
+					row_number() over (order by A.reporter_no asc) rn,
+					A.reporter_no			as reporterNo,
+					A.reporter_id			as reporterId,
+					A.reporter_name			as reporterName,
+					A.reporter_pos			as "reporterPos.positionNo",
+					A.reporter_email		as reporterEmail,
+					A.reporter_phone		as reporterPhone,
+					A.reporter_pw			as reporterPw,
+					A.dept_no				as "deptNo.deptNo",
+					B.POS_NAME				as "reporterPos.positionName",
+					C.DEPT_NAME				as "deptNo.deptName"
+				from
+					reporter_employee A , tb_position B ,REPORTER_DEPT C
+				where A.REPORTER_POS = B.POS_NO
+				and A.DEPT_NO = C.DEPT_NO)		
+		where rn >= #beginIndex# and rn <= #endIndex#
+		]]>
+	</select>
+	
+	<select id="getReporterAllSearch" parameterClass="kr.co.jtimes.common.criteria.ReporterCriteria" resultClass="ReporterEmployeeVo">
+		<![CDATA[
+		select
+			*
+		from (select
+					row_number() over (order by A.reporter_no asc) rn,
+					A.reporter_no			as reporterNo,
+					A.reporter_id			as reporterId,
+					A.reporter_name			as reporterName,
+					A.reporter_pos			as "reporterPos.positionNo",
+					A.reporter_email		as reporterEmail,
+					A.reporter_phone		as reporterPhone,
+					A.reporter_pw			as reporterPw,
+					A.dept_no				as "deptNo.deptNo",
+					B.POS_NAME				as "reporterPos.positionName",
+					C.DEPT_NAME				as "deptNo.deptName"
+				from
+					reporter_employee A , tb_position B ,REPORTER_DEPT C
+				where A.REPORTER_POS = B.POS_NO
+				and A.DEPT_NO = C.DEPT_NO
+				and A.reporter_name like '%'|| #search# || '%')		
+		where rn >= #beginIndex# and rn <= #endIndex#
+		]]>
+	</select>
+	
+	<select id="getReporterByNo" parameterClass="int" resultClass="ReporterEmployeeVo">
+		select 
+			A.reporter_no			as reporterNo,
+			A.reporter_id			as reporterId,
+			A.reporter_name			as reporterName,
+			A.reporter_pos			as "reporterPos.positionNo",
+			A.reporter_email		as reporterEmail,
+			A.reporter_phone		as reporterPhone,
+			A.reporter_pw			as reporterPw,
+			A.dept_no				as "deptNo.deptNo",
+			B.POS_NAME				as "reporterPos.positionName",
+			C.dept_name				as "deptNo.deptName"
+		from
+			reporter_employee A , tb_position B, REPORTER_DEPT C
+		where
+			A.reporter_pos = B.POS_NO
+			and A.dept_no = C.dept_no
+			AND A.reporter_no = #value#
+	</select>
+
+	<insert id="addReporter" parameterClass="ReporterEmployeeVo">
+		insert into reporter_employee
+			(reporter_no, reporter_id, reporter_name, reporter_pos, reporter_email, reporter_phone, reporter_pw, dept_no)
+		values
+			(seq_rep_emp.nextval, #reporterId#, #reporterName#, #reporterPos.positionNo# ,#reporterEmail#, #reporterPhone#, #reporterPw#, #deptNo.deptNo#)
+	</insert>
+
+	<select id="getReporterById" parameterClass="string" resultClass="ReporterEmployeeVo">
+		select 
+			A.reporter_no			as reporterNo,
+			A.reporter_id			as reporterId,
+			A.reporter_name			as reporterName,
+			A.reporter_pos			as "reporterPos.positionNo",
+			A.reporter_email		as reporterEmail,
+			A.reporter_phone		as reporterPhone,
+			A.reporter_pw			as reporterPw,
+			A.dept_no				as "deptNo.deptNo",
+			B.POS_NAME				as "reporterPos.positionName"
+		from
+			reporter_employee A , tb_position B
+		where
+			A.reporter_pos = B.POS_NO
+			AND A.reporter_id = #value#
+	</select>
+	
+	<select id="getBossReportersByNo" parameterClass="int" resultClass="ReporterEmployeeVo">
+		select 
+			reporter_no			as reporterNo,
+			reporter_id			as reporterId,
+			reporter_name		as reporterName,
+			reporter_pos		as "reporterPos.positionNo",
+			reporter_email		as reporterEmail,
+			reporter_phone		as reporterPhone,
+			reporter_pw			as reporterPw,
+			dept_no				as "deptNo.deptNo"
+		from 
+			reporter_employee
+		where 
+			REPORTER_POS = 200
+	</select>
+	
+	<select id="getChiefs" resultClass="ReporterEmployeeVo">
+		select 
+			reporter_no			as reporterNo,
+			reporter_id			as reporterId,
+			reporter_name		as reporterName,
+			reporter_pos		as "reporterPos.positionNo",
+			reporter_email		as reporterEmail,
+			reporter_phone		as reporterPhone,
+			reporter_pw			as reporterPw,
+			dept_no				as "deptNo.deptNo"
+		from 
+			reporter_employee
+		where 
+			REPORTER_POS = 100
+	</select>
+		
+	<select id="getTotalEmployeeRows" resultClass="int">
+		select 
+			count(*)
+		from 
+			reporter_employee
+	</select>
+		
+	<update id="masterUpdate" parameterClass="ReporterEmployeeVo">
+		update
+			reporter_employee
+		set
+			reporter_email = #reporterEmail#,
+			reporter_phone = #reporterPhone#,
+			reporter_pw = #reporterPw#,
+			reporter_pos = #reporterPos.positionNo#,
+			reporter_name = #reporterName#,
+			reporter_id = #reporterId#,
+			dept_no = #deptNo.deptNo#
+		where
+			reporter_no = #reporterNo#
+	</update>
+	
+	<update id="updateReporterAll" parameterClass="ReporterEmployeeVo">
+		update 
+			reporter_employee
+		set 
+			reporter_email = #reporterEmail#,
+			reporter_phone = #reporterPhone#
+		where
+			reporter_id = #reporterId#
+	</update>
+	
+	<update id="updateReporterPassword" parameterClass="ReporterEmployeeVo">
+		update 
+			reporter_employee
+		set 
+			reporter_no = #reporterNo#,
+			reporter_id = #reporterId#,
+			reporter_name = #reporterName#,
+			reporter_pos = #reporterPos.positionNo#,
+			reporter_email = #reporterEmail#,
+			reporter_phone = #reporterPhone#,
+			reporter_pw = #reporterPw#, 
+			dept_no = #deptNo.deptNo#
+
+		where
+			reporter_id = #reporterId#
+	</update>
+	
+	<update id="findPassword" parameterClass="ReporterEmployeeVo">
+		update 
+			reporter_employee
+		set 
+			reporter_pw = #reporterPw#
+		where
+			reporter_name = #reporterName#
+		and	reporter_phone = #reporterPhone# 
+	</update>
+	
+	<select id="getEmailPwd" parameterClass="ReporterEmployeeVo" resultClass="ReporterEmployeeVo">
+	select
+		reporter_pw			as reporterPw,
+		reporter_email		as reporterEmail
+	from
+		reporter_employee
+	where
+		reporter_name 	=	#reporterName#
+	and	reporter_phone	=	#reporterPhone#
+	</select>
+	
+
+</sqlMap>

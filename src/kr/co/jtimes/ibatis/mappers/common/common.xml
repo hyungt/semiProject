@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="unionCommons">
+	<typeAlias alias="category" type="kr.co.jtimes.common.vo.NewsCategoryVo"/>
+	<typeAlias alias="newsType" type="kr.co.jtimes.common.vo.NewsTypeVo"/>
+	<typeAlias alias="position" type="kr.co.jtimes.common.vo.ReporterPositionVo"/>
+	<typeAlias alias="dept" type="kr.co.jtimes.common.vo.DepartmentVo"/>
+	
+	<select id="getNewsCategoryDataByNo" resultClass="category">
+		select
+			category_no			as categoryNo,
+			category_name		as categoryName
+		from
+			news_category
+		where
+			category_no = #value#
+	</select>
+	
+	<select id="getNewsTypeDataByNo" resultClass="newsType">
+		select
+			news_type_no		as newsTypeNo,
+			news_type_name		as newsTypeName
+		from
+			news_type
+		where
+			news_type_no = #value#
+	</select>
+	
+	<select id="getAllDepartment" resultClass="dept">
+		select
+			dept_no				as no,
+			dept_name			as name
+		from
+			reporter_dept
+	</select>
+	
+	<select id="getAllCategory" resultClass="category">
+		select
+			category_no			as categoryNo,
+			category_name		as categoryName
+		from
+			news_category
+	</select>
+	
+	<select id="getAllNewsType" resultClass="newsType">
+		select
+			news_type_no		as newsTypeNo,
+			news_type_name		as newsTypeName
+		from
+			news_type
+	</select>
+	
+	<select id="getAllPosition" resultClass="position">
+		select
+			pos_no				as positionNo,
+			pos_name			as positionName
+		from
+			tb_position
+	</select>
+	
+</sqlMap>

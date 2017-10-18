@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="signtble">
+	
+	<typeAlias alias="sign" type="kr.co.jtimes.reporter.sign.vo.NewsSignVo"/>
+	<typeAlias alias="signCriteria" type="kr.co.jtimes.common.criteria.SignCriteria"/>
+	
+	<insert id="insertNewsSign" parameterClass="sign">
+		insert into tb_news_sign
+			(news_sign_no, news_no, news_writer_no, first_sign_state, second_sign_state, first_signer_no, second_signer_no)
+		values
+			(seq_sign.nextval, #news.newsNo#, #writer.reporterNo#, 'N', 'N', #firstSigner.reporterNo#, #secondSigner.reporterNo#)
+	</insert>
+	
+	<update id="updateSign" parameterClass="sign">
+		update tb_news_sign 
+		set	
+			news_sign_no = 		#no#,
+			news_no = 			#news.newsNo#,
+			news_writer_no = 	#writer.reporterNo#,
+			first_signer_no = 	#firstSigner.reporterNo#,
+			second_signer_no = 	#secondSigner.reporterNo#,
+			first_sign_state = 	#firstSignState#,
+			second_sign_state = #secondSignState#
+		where
+			news_sign_no = #no#
+	</update>
+	
+	<select id="getNewsSign" parameterClass="int" resultClass="sign">
+		select 
+			S.news_sign_no			as "no",
+			S.news_no				as "news.newsNo",
+			NEWS.news_title				as "news.newsTitle",
+			S.news_writer_no			as "writer.reporterNo",
+			WRITER.reporter_name		as "writer.reporterName",
+			S.first_sign_state		as firstSignState,
+			S.second_sign_state		as secondSignState,
+			S.first_signer_no		as "firstSigner.reporterNo",
+			S.second_signer_no		as "secondSigner.reporterNo",
+			NEWS.news_regdate		as "news.regdate"
+		from 
+			tb_news_sign S, tb_news NEWS, reporter_employee WRITER
+		where
+			S.news_no = NEWS.news_no
+		and
+			S.news_writer_no = WRITER.reporter_no
+		and
+			news_sign_no = #value#
+	</select>
+	
+	<select id="getFirstSignList" parameterClass="int" resultClass="sign">
+		select 
+			S.news_sign_no			as "no",
+			S.news_no				as "news.newsNo",
+			NEWS.news_title				as "news.newsTitle",
+			S.news_writer_no			as "writer.reporterNo",
+			WRITER.reporter_name		as "writer.reporterName",
+			S.first_sign_state		as firstSignState,
+			S.second_sign_state		as secondSignState,
+			S.first_signer_no		as "firstSigner.reporterNo",
+			S.second_signer_no		as "secondSigner.reporterNo",
+			NEWS.news_regdate		as "news.regdate"
+		from 
+			tb_news_sign S, tb_news NEWS, reporter_employee WRITER
+		where
+			S.news_no = NEWS.news_no
+		and
+			S.news_writer_no = WRITER.reporter_no
+		and
+			first_signer_no = #value#
+		order by "no" desc
+	</select>
+	
+	<select id="getSecondSignList" parameterClass="int" resultClass="sign">
+		select 
+			S.news_sign_no			as "no",
+			S.news_no				as "news.newsNo",
+			NEWS.news_title				as "news.newsTitle",
+			S.news_writer_no			as "writer.reporterNo",
+			WRITER.reporter_name		as "writer.reporterName",
+			S.first_sign_state		as firstSignState,
+			S.second_sign_state		as secondSignState,
+			S.first_signer_no		as "firstSigner.reporterNo",
+			S.second_signer_no		as "secondSigner.reporterNo",
+			NEWS.news_regdate		as "news.regdate"
+		from 
+			tb_news_sign S, tb_news NEWS, reporter_employee WRITER
+		where
+			S.news_no = NEWS.news_no
+		and
+			S.news_writer_no = WRITER.reporter_no
+		and
+			second_signer_no = #value#
+		and
+			first_sign_state = 'Y'
+		order by "no" desc
+	</select>
+	
+	<select id="getTotalFirtsRows" parameterClass="signCriteria" resultClass="int">
+		select count(*) from tb_news_sign
+		where first_sign_state = #state#
+		and first_signer_no = #signerNo#
+	</select>
+	
+	<select id="getTotalSecondRows" parameterClass="signCriteria" resultClass="int">
+		select count(*) from tb_news_sign
+		where second_sign_state = #state#
+		and second_signer_no = #signerNo#
+	</select>
+	
+	<select id="getNewsSignByNewsNo" parameterClass="int" resultClass="sign">
+		select
+			news_sign_no			as "no", 
+			news_no					as "news.newsNo", 
+			news_writer_no			as "writer.reporterNo", 
+			first_sign_state		as firstSignState, 
+			second_sign_state		as secondSignState,
+			first_signer_no			as "firstSigner.reporterNo",
+			second_signer_no		as "secondSigner.reporterNo"
+		from
+			tb_news_sign
+		where 
+			news_no = #value#
+	</select>
+	
+	<select id="getFirstSignListByState" parameterClass="signCriteria" resultClass="sign">
+	<![CDATA[
+		select * 
+		from(select
+			row_number() over (order by NEWS.news_no desc) rn,
+			S.news_sign_no			as "no",
+			S.news_no				as "news.newsNo",
+			NEWS.news_title				as "news.newsTitle",
+			S.news_writer_no			as "writer.reporterNo",
+			WRITER.reporter_name		as "writer.reporterName",
+			S.first_sign_state		as firstSignState,
+			S.second_sign_state		as secondSignState,
+			S.first_signer_no		as "firstSigner.reporterNo",
+			S.second_signer_no		as "secondSigner.reporterNo",
+			NEWS.news_regdate		as "news.regdate"
+		from 
+			tb_news_sign S, tb_news NEWS, reporter_employee WRITER
+		where
+			S.news_no = NEWS.news_no
+		and
+			S.news_writer_no = WRITER.reporter_no
+		and
+			first_signer_no = #signerNo#
+		and
+			first_sign_state = #state#)
+		where rn >= #beginIndex# and rn <= #endIndex#
+	]]>
+	</select>
+	
+	<select id="getSecondSignListByState" parameterClass="signCriteria" resultClass="sign">
+	<![CDATA[
+		select *
+		from
+			(select
+				row_number() over (order by NEWS.news_no desc) rn,
+				S.news_sign_no			as "no",
+				S.news_no				as "news.newsNo",
+				NEWS.news_title				as "news.newsTitle",
+				S.news_writer_no			as "writer.reporterNo",
+				WRITER.reporter_name		as "writer.reporterName",
+				S.first_sign_state		as firstSignState,
+				S.second_sign_state		as secondSignState,
+				S.first_signer_no		as "firstSigner.reporterNo",
+				S.second_signer_no		as "secondSigner.reporterNo",
+				NEWS.news_regdate		as "news.regdate"
+			from 
+				tb_news_sign S, tb_news NEWS, reporter_employee WRITER
+			where
+				S.news_no = NEWS.news_no
+			and
+				S.news_writer_no = WRITER.reporter_no
+			and
+				second_signer_no = #signerNo#
+			and
+				first_sign_state = 'Y'
+			and
+				second_sign_state = #state#)
+			where rn >= #beginIndex# and rn <= #endIndex#
+	]]>
+	</select>
+	
+	<select id="getTotalSignRowByReporterNo" parameterClass="int" resultClass="int">
+		select	
+			count(*)
+		from
+			TB_NEWS_SIGN
+		WHERE
+			NEWS_WRITER_NO = #value#
+	</select>
+	
+	<select id="getSignListByReporterNo" parameterClass="signCriteria" resultClass="sign">
+	<![CDATA[
+		select * 
+		from(select
+				ROW_NUMBER() OVER (ORDER BY NS.NEWS_NO DESC) rn,
+				NS.NEWS_SIGN_NO			as "no",
+				NS.NEWS_NO					AS "news.newsNo",
+				NEWS.NEWS_TITLE			AS "news.newsTitle",
+				NEWS.NEWS_REGDATE		as "news.regdate",
+				NS.FIRST_SIGN_STATE		AS firstSignState,
+				NS.SECOND_SIGN_STATE	AS secondSignState
+			from 
+				tb_news NEWS, TB_NEWS_SIGN NS
+			where  
+				NS.NEWS_WRITER_NO = NEWS.REPORTER_NO
+				AND NEWS.NEWS_NO = NS.NEWS_NO
+				AND NEWS.REPORTER_NO = #writerNo#)
+		where 
+			rn >= #beginIndex# and rn <= #endIndex#
+	]]>
+	</select>
+	
+	
+</sqlMap>

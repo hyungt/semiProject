@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="reporter">
+	<typeAlias alias="AdVo" type="kr.co.jtimes.ad.vo.AdVo"/>
+	<typeAlias alias="AdCriteria" type="kr.co.jtimes.common.criteria.AdCriteria"/>
+	
+	<select id="getAdAll" resultClass="AdVo" >
+		select
+			ad_no			as adNo,
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			tb_ad
+		order by adNo 
+	</select>
+	
+	<select id="getAdByCriteria" parameterClass="AdCriteria" resultClass="AdVo" >
+	<![CDATA[
+		select
+			ad_no			as adNo,
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			(SELECT ROW_NUMBER() OVER(ORDER BY ad_no desc) rn, ad_no , ad_img_path , ad_title, ad_link, ad_start_date, ad_end_date
+			from tb_ad )
+		where rn >= #beginIndex# and rn <= #endIndex#
+		
+		]]>
+	</select>
+	
+	<insert id="addAd" parameterClass="AdVo">
+		insert into tb_ad
+			(ad_no, ad_img_path, ad_link, ad_start_date, ad_end_date, ad_title)
+		values
+			(seq_ad.nextval, #adImgPath#, #adLink#, #adStartDate# ,#adEndDate#, #adTitle#)
+	</insert>
+	
+	<select id="getAdByNo" parameterClass="int" resultClass="AdVo">
+		select
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			tb_ad
+		where
+			ad_no = #value#
+	</select>
+	
+	
+	<select id="getAdByDate" resultClass="AdVo" >
+	<![CDATA[
+		select
+			ad_no			as adNo,
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			tb_ad
+		order by adNo
+		]]>
+	</select>
+	
+	<select id="getAdByIng" parameterClass="AdCriteria" resultClass="AdVo" >
+	<![CDATA[
+		select
+			ad_no			as adNo,
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			(SELECT ROW_NUMBER() OVER(ORDER BY ad_no desc) rn, ad_no , ad_img_path , ad_title, ad_link, ad_start_date, ad_end_date
+			from tb_ad 
+			)
+		where 
+			rn >= #beginIndex# and rn <= #endIndex#
+		
+		]]>
+	</select>
+	
+	
+	<select id="getAdDone" parameterClass="AdCriteria" resultClass="AdVo" >
+	<![CDATA[
+		select
+			ad_no			as adNo,
+			ad_img_path		as adImgPath,
+			ad_title		as adTitle,
+			ad_link			as adLink,
+			ad_start_date	as adStartDate,
+			ad_end_date		as adEndDate
+		from
+			(SELECT ROW_NUMBER() OVER(ORDER BY ad_no desc) rn, ad_no , ad_img_path , ad_title, ad_link, ad_start_date, ad_end_date
+			from 
+				tb_ad )
+		where
+			rn >= #beginIndex# and rn <= #endIndex#
+		 
+		]]>
+	</select>
+	
+	
+</sqlMap>

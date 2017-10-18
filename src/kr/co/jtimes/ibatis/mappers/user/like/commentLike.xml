@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="commentLike">
+
+	<typeAlias alias="CommentLike" type="kr.co.jtimes.news.comment.vo.CommentLikeVo"/>
+	
+	<insert id="addCommentLike" parameterClass="CommentLike">
+		insert into comment_like
+		(comment_preference, comment_no, user_no)
+		values 
+		(#preference#, #cno#, #uno#)
+	</insert>
+
+	<select id="getCommentLikeByCommentNo" parameterClass="CommentLike" resultClass="int">
+		select
+			count(*)
+		from
+			comment_like
+		where
+			comment_no = #cno#
+		and 
+			comment_preference = #preference#
+	</select>
+
+
+</sqlMap>

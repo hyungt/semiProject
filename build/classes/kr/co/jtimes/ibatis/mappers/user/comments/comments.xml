@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="comment">
+
+	<typeAlias alias="Comment" type="kr.co.jtimes.news.comment.vo.NewCommentVo"/>
+	
+	<insert id="addComment" parameterClass="Comment">
+		insert into news_comments
+		(comment_no, comment_regdate, news_no, user_no, comment_contents)
+		values 
+		(seq_cmt.nextval, sysdate, #tbNewsVo.newsNo#, #userVo.no#, #commentContents#)
+	</insert>
+	
+	<select id="getCommentByNewsNo" parameterClass="kr.co.jtimes.common.criteria.CommentCriteria" resultClass="Comment">
+		select 
+			*
+		from (
+		select
+			ROW_NUMBER() over(order by comment_no desc) rn,
+			A.comment_no			as commentNo, 
+			A.comment_regdate		as commentRegDate, 
+			B.news_no				as "tbNewsVo.newsNo", 
+			C.user_no				as "userVo.no", 
+			A.comment_contents		as commentContents,
+			C.user_id				as "userVo.id"
+		from
+			news_comments A, tb_news B, tb_user C
+		where
+			A.news_no = B.news_no
+		and 
+			A.user_no = C.user_no
+		and
+			B.news_no =#newsNo#)
+		WHERE rn >= #beginIndex#
+		and rn &lt;= #endIndex#
+	</select>
+	
+	<select id="getTotalCommentRows" parameterClass="int" resultClass="int">
+		select count(*) from news_comments where news_no = #value#
+	</select>
+</sqlMap>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="citizenrap">
+
+
+
+	<typeAlias alias="citizenrap" type="kr.co.jtimes.citizenrep.vo.CitizenRepVo"/>
+
+	<insert id="addCitizenRep" parameterClass="citizenrap">
+		insert into TB_CITIZEN_REPORT (CR_NO, CR_TITLE, CR_CONTENTS, CR_REGDATE, CR_WRITER_NO)
+		values (SEQ_CIT_REP.nextval, #citizenRepTitle#, #citizenRepContents#, sysdate, #writer.no#)
+	</insert>
+	<select id="getAllCitRepNoMaster" resultClass="citizenrap">
+	select 		
+		A.CR_NO					AS citizenRepNo,
+		A.CR_TITLE				AS citizenRepTitle,
+		A.CR_CONTENTS			AS citizenRepContents,
+		A.CR_REGDATE			AS citizenRepCreateDate,	
+		A.CR_WRITER_NO			AS "writer.no",
+		B.USER_ID				AS "writer.id"
+	from
+		TB_CITIZEN_REPORT A, TB_USER B
+	WHERE
+		A.CR_WRITER_NO = B.USER_NO
+	AND
+		A.CR_ACTIVE = 'Y'
+	AND
+		A.CR_WRITER_NO	 != 0
+	order by
+		A.CR_NO desc
+	</select>
+	
+	<select id="getAllCitRepMaster" resultClass="citizenrap">
+	select 		
+		A.CR_NO					AS citizenRepNo,
+		A.CR_TITLE				AS citizenRepTitle,
+		A.CR_CONTENTS			AS citizenRepContents,
+		A.CR_REGDATE			AS citizenRepCreateDate,	
+		A.CR_WRITER_NO			AS "writer.no",
+		B.USER_ID				AS "writer.id"
+	from
+		TB_CITIZEN_REPORT A, TB_USER B
+	WHERE
+		A.CR_WRITER_NO = B.USER_NO
+	AND
+		A.CR_ACTIVE = 'Y'
+	AND
+		A.CR_WRITER_NO = 0
+	order by
+		A.CR_NO desc
+	</select>
+	
+	<select id="getCitRepByNo" parameterClass="int" resultClass="citizenrap">
+		select 	A.CR_NO				as citizenRepNo,
+				A.CR_TITLE			as citizenRepTitle,
+				A.CR_CONTENTS		as citizenRepContents,
+				A.CR_REGDATE		as citizenRepCreateDate,
+				A.CR_WRITER_NO		as "writer.no",
+				B.USER_ID			as "writer.id"
+		from
+			TB_CITIZEN_REPORT A, TB_USER B
+		where
+			A.CR_WRITER_NO = B.USER_NO
+		and
+			A.CR_NO = #value#
+	</select>
+	
+	<select id="getCitRepNoByTitle" parameterClass="string" resultClass="citizenrap">
+		select 	A.CR_NO				as citizenRepNo,
+				A.CR_TITLE			as citizenRepTitle,
+				A.CR_CONTENTS		as citizenRepContents,
+				A.CR_REGDATE		as citizenRepCreateDate,
+				A.CR_WRITER_NO		as "writer.no",
+				B.USER_ID			as "writer.id"
+		from
+			TB_CITIZEN_REPORT A, TB_USER B
+		where
+			A.CR_WRITER_NO = B.USER_NO
+		and
+			A.CR_TITLE = #value#
+	</select>
+	
+	<update id="deleteCitRep" parameterClass="int">
+		update TB_CITIZEN_REPORT set CR_ACTIVE='N'
+		where CR_NO = #value#
+	</update>
+	
+	<update id="editCitRep" parameterClass="citizenrap">
+		update TB_CITIZEN_REPORT set 
+			CR_TITLE= #citizenRepTitle#,
+			CR_CONTENTS = #citizenRepContents#
+		where CR_NO = #citizenRepNo#
+	</update>
+	<select id="getTotalRows" resultClass="int">
+		SELECT COUNT(*)
+		FROM TB_CITIZEN_REPORT
+		where CR_ACTIVE = 'Y'
+		and CR_WRITER_NO != 0
+	</select>
+	<select id="getCitReps" parameterClass="kr.co.jtimes.common.criteria.Criteria" resultClass="citizenrap">
+		<![CDATA[
+		SELECT 
+				A.CR_NO				as citizenRepNo,
+				A.CR_TITLE			as citizenRepTitle,
+				A.CR_CONTENTS		as citizenRepContents,
+				A.CR_REGDATE		as citizenRepCreateDate,
+				A.CR_WRITER_NO		as "writer.no",
+				B.USER_ID			as "writer.id"
+		FROM(SELECT ROW_NUMBER() OVER (ORDER BY CR_NO DESC) rn, CR_NO, CR_TITLE, CR_CONTENTS, CR_REGDATE, CR_WRITER_NO
+			 FROM TB_CITIZEN_REPORT
+			 where CR_ACTIVE = 'Y'
+			 AND
+				CR_WRITER_NO != 0
+			 	) A, TB_USER B
+		WHERE 
+			A.CR_WRITER_NO = B.USER_NO
+		AND
+			rn >= #beginIndex# AND rn <= #endIndex#
+		]]>
+	</select>
+</sqlMap>

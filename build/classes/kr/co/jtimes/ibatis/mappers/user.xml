@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="user">
+	<typeAlias alias="User" type="kr.co.jtimes.profile.common.vo.UserVo"/>
+	
+	<insert id="addUser" parameterClass="User">
+		insert into tb_user(user_no, user_id, user_pw, user_name, user_email, user_pw_question, user_pw_answer)
+		values(seq_user.nextval, #id#, #pwd#, #name#, #email#, #pwdQuestion#, #pwdAnswer#)
+	</insert>
+	
+	<select id="loginUser" parameterClass="User" resultClass="User">
+		select
+			user_no			as no,
+			user_id			as id,
+			user_pw			as pwd,
+			user_name		as name,
+			user_email		as email,
+			user_pw_question 	as pwdQuestion, 
+			user_pw_answer		as pwdAnswer
+		from
+			tb_user
+		where 
+			user_id = #id#
+			and user_pw = #pwd#
+	</select>
+	<select id="getUserById" parameterClass="string" resultClass="User">
+		select
+			user_no			as no,
+			user_id			as id,
+			user_pw			as pwd,
+			user_name		as name,
+			user_email		as email,
+			user_pw_question 	as pwdQuestion, 
+			user_pw_answer		as pwdAnswer
+		from
+			tb_user
+		where user_id = #value#
+	</select>
+	<select id="getUserAll" resultClass="User">
+		select
+			user_no			as no,
+			user_id			as id,
+			user_pw			as pwd,
+			user_name		as name,
+			user_email		as email,
+			user_pw_question 	as pwdQuestion, 
+			user_pw_answer		as pwdAnswer
+		from
+			tb_user
+	</select>
+	
+	<select id="getLoginId" parameterClass="User" resultClass="User">
+		select
+			user_id			as id,
+			user_email		as email,
+			user_name		as name
+		from
+			tb_user
+		where
+			user_email = #email#
+			and user_name = #name#
+	</select>
+	
+	<select id="getLoginPwd" parameterClass="User" resultClass="User">
+		select
+			user_pw		as pwd,
+			user_email		as email
+		from
+			tb_user
+		where
+			user_id = #id#
+			and user_email = #email#
+			and user_pw_question = #pwdQuestion#
+			and user_pw_answer = #pwdAnswer#
+	</select>
+	<update id="updatePwd" parameterClass="User">
+		update 
+			tb_user
+		set 
+			user_pw = #pwd#
+		where
+			user_id = #id#
+			and user_email = #email#
+			and user_pw_question = #pwdQuestion#
+			and user_pw_answer = #pwdAnswer#
+	</update>
+	<update id="profileFix" parameterClass="User">
+		update 
+			tb_user
+		set 
+			user_email = #email#,
+			user_pw_question = #pwdQuestion#,
+			user_pw_answer = #pwdAnswer#
+			
+		where
+			user_pw = #pwd#
+	</update>
+	
+</sqlMap>

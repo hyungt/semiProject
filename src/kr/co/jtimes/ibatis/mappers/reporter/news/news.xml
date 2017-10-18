@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="news">
+
+	<typeAlias alias="news" type="kr.co.jtimes.news.vo.TbNewsVo"/>
+	<typeAlias alias="temp" type="kr.co.jtimes.news.vo.TemporaryNewsVo"/>
+	<typeAlias alias="criteria" type="kr.co.jtimes.common.criteria.NewsCriteria"/>
+	
+	<select id="getNews" parameterClass="int" resultClass="news">
+		select
+			news_no 		as newsNo, 
+			news_location 	as newsLocation, 
+			news_title 		as newsTitle, 
+			news_contents	as newsContents, 
+			news_regdate	as regdate, 
+			news_img_path	as newsImgPath, 
+			news_view_cnt	as newsViewCnt, 
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo", 
+			category_no		as "category.categoryNo", 
+			reporter_no		as "reporter.reporterNo"
+		from tb_news
+		where
+			news_no =#value#
+		and
+			news_sign_state = 'Y'
+	</select>
+	
+	<select id="getNewsBack" parameterClass="int" resultClass="news">
+		select
+			news_no 		as newsNo, 
+			news_location 	as newsLocation, 
+			news_title 		as newsTitle, 
+			news_contents	as newsContents, 
+			news_regdate	as regdate, 
+			news_img_path	as newsImgPath, 
+			news_view_cnt	as newsViewCnt, 
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo", 
+			category_no		as "category.categoryNo", 
+			reporter_no		as "reporter.reporterNo"
+		from tb_news
+		where
+			news_no =#value#
+	</select>
+	
+	<select id="getNewsNextSequence" resultClass="int">
+		select seq_news.nextval from dual
+	</select>
+	
+	<select id="getTodayNewsList" resultClass="news">
+	<![CDATA[
+		select 
+			news_no			as newsNo,
+			news_location	as newsLocation,
+			news_title		as newsTitle,
+			news_contents	as newsContents,
+			news_regdate	as regdate,
+			news_img_path	as newsImgPath,
+			news_view_cnt	as newsViewCnt,
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo",
+			category_no		as "category.categoryNo"
+		from (select
+				row_number() over (order by news_regdate desc) rn,
+				news_no 			, 
+				news_location 		, 
+				news_title 			, 
+				news_contents		, 
+				news_regdate		, 
+				news_img_path		, 
+				news_view_cnt		, 
+				news_sign_state		, 
+				news_type_no		, 
+				category_no	
+			from tb_news
+			where news_sign_state = 'Y')
+			where rn >= 1 and rn <= 20
+	]]>
+	</select>
+	
+	<select id="getNewsByCategory" parameterClass="criteria" resultClass="news">
+	<![CDATA[
+		select 
+			news_no			as newsNo,
+			news_location	as newsLocation,
+			news_title		as newsTitle,
+			news_contents	as newsContents,
+			news_regdate	as regdate,
+			news_img_path	as newsImgPath,
+			news_view_cnt	as newsViewCnt,
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo",
+			news_type_name	as "newsType.newsTypeName",
+			category_no		as "category.categoryNo",
+			reporter_no		as "reporter.reporterNo",
+			reporter_name	as "reporter.reporterName"
+		from (select
+			row_number() over (order by NEWS.news_no desc) rn,
+			NEWS.news_no 			, 
+			NEWS.news_location 		, 
+			NEWS.news_title 		, 
+			NEWS.news_contents		, 
+			NEWS.news_regdate		, 
+			NEWS.news_img_path		, 
+			NEWS.news_view_cnt		, 
+			NEWS.news_sign_state	, 
+			NEWS.news_type_no		, 
+			NEWS.category_no		, 
+			NEWS.reporter_no		,
+			REP.reporter_name		,
+			NT.news_type_name		
+		from tb_news NEWS, reporter_employee REP, news_type NT
+		where NEWS.reporter_no = REP.reporter_no
+		and NEWS.category_no = #categoryNo#
+		and NEWS.news_type_no = NT.news_type_no)
+		where rn >= #beginIndex# and rn <= #endIndex#
+	]]>
+	</select>
+		<select id="getNewsByCategoryAndSign" parameterClass="criteria" resultClass="news">
+	<![CDATA[
+		select 
+			news_no			as newsNo,
+			news_location	as newsLocation,
+			news_title		as newsTitle,
+			news_contents	as newsContents,
+			news_regdate	as regdate,
+			news_img_path	as newsImgPath,
+			news_view_cnt	as newsViewCnt,
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo",
+			news_type_name	as "newsType.newsTypeName",
+			category_no		as "category.categoryNo",
+			reporter_no		as "reporter.reporterNo",
+			reporter_name	as "reporter.reporterName"
+		from (select
+				row_number() over (order by NEWS.news_no desc) rn,
+				NEWS.news_no 			, 
+				NEWS.news_location 		, 
+				NEWS.news_title 		, 
+				NEWS.news_contents		, 
+				NEWS.news_regdate		, 
+				NEWS.news_img_path		, 
+				NEWS.news_view_cnt		, 
+				NEWS.news_sign_state	, 
+				NEWS.news_type_no		, 
+				NEWS.category_no		, 
+				NEWS.reporter_no		,
+				REP.reporter_name		,
+				NT.news_type_name		
+			from tb_news NEWS, reporter_employee REP, news_type NT
+			where NEWS.reporter_no = REP.reporter_no
+			and NEWS.news_sign_state = 'Y'
+			and NEWS.category_no = #categoryNo#
+			and NEWS.news_type_no = NT.news_type_no)
+		where rn >= #beginIndex# and rn <= #endIndex#
+	]]>
+	</select>
+	
+	<select id="getNewsCountAllByCategory" parameterClass="int" resultClass="int">
+		select count(*) from tb_news where category_no = #value#
+	</select>
+	
+	
+	<insert id="insertNews" parameterClass="news">
+		INSERT INTO tb_news 
+			(news_no, news_location, news_title, news_contents, news_regdate, news_img_path, news_view_cnt, news_sign_state, news_type_no, category_no, reporter_no)
+		VALUES 
+			(#newsNo#, #newsLocation#, #newsTitle#, #newsContents#, sysdate, #newsImgPath#, 0, 'N', #newsType.newsTypeNo#, #category.categoryNo#, #reporter.reporterNo#)
+	</insert>
+	
+	<update id="updateNews" parameterClass="news">
+		update tb_news
+		set
+			news_view_cnt = #newsViewCnt#
+		where
+			news_no = #newsNo#
+	</update>
+	
+	<update id="updateToNews" parameterClass="news">
+		update 
+			tb_news
+		set
+			news_no = #newsNo#
+			, news_location = #newsLocation#
+			, news_title = #newsTitle#
+			, news_contents = #newsContents#
+			, news_regdate = #regdate#
+			, news_img_path = #newsImgPath#
+			, news_view_cnt = #newsViewCnt#
+			, news_sign_state = #newsSignState#
+			, news_type_no = #newsType.newsTypeNo#
+			, category_no = #category.categoryNo#
+			, reporter_no = #reporter.reporterNo#
+		where
+			news_no = #newsNo#
+	</update>
+	
+	<select id="getMainNews" resultClass="news">
+	<![CDATA[
+		select 
+			news_no			as newsNo,
+			news_location	as newsLocation,
+			news_title		as newsTitle,
+			news_contents	as newsContents,
+			news_regdate	as regdate,
+			news_img_path	as newsImgPath,
+			news_view_cnt	as newsViewCnt,
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo",
+			category_no		as "category.categoryNo"
+	from (select
+				row_number() over (order by news_regdate desc) rn,
+				NEWS.news_no 			, 
+				NEWS.news_location 		, 
+				NEWS.news_title 		, 
+				NEWS.news_contents		, 
+				NEWS.news_regdate		, 
+				NEWS.news_img_path		, 
+				NEWS.news_view_cnt		, 
+				NEWS.news_sign_state	, 
+				NEWS.news_type_no		, 
+				NEWS.category_no		, 
+				NT.news_type_name
+			from tb_news NEWS, news_type NT
+			where NT.news_type_no = 200
+			and NEWS.news_type_no = NT.news_type_no
+			and NEWS.news_sign_state = 'Y')
+	where rn = 1
+	]]>
+	</select>
+	
+	<select id="getYesterdayImportantNewses" resultClass="news">
+	<![CDATA[
+		select 
+			news_no			as newsNo,
+			news_location	as newsLocation,
+			news_title		as newsTitle,
+			news_contents	as newsContents,
+			news_regdate	as regdate,
+			news_img_path	as newsImgPath,
+			news_view_cnt	as newsViewCnt,
+			news_sign_state	as newsSignState, 
+			news_type_no	as "newsType.newsTypeNo",
+			category_no		as "category.categoryNo"
+		from (select
+				row_number() over (order by news_regdate desc) rn,
+				NEWS.news_no 			, 
+				NEWS.news_location 		, 
+				NEWS.news_title 		, 
+				NEWS.news_contents		, 
+				NEWS.news_regdate		, 
+				NEWS.news_img_path		, 
+				NEWS.news_view_cnt		, 
+				NEWS.news_sign_state	, 
+				NEWS.news_type_no		, 
+				NEWS.category_no		, 
+				NT.news_type_name
+			from tb_news NEWS, news_type NT
+			where NT.news_type_no = 200
+			and NEWS.news_type_no = NT.news_type_no
+			and NEWS.news_sign_state = 'Y')
+		where rn >= 1 and rn <= 6
+	]]>
+	</select>
+	
+	<select id="getTemporaryNewsByReporterNo" parameterClass="int" resultClass="temp">
+		select
+			news_no			as "no",
+			news_location	as location,
+			news_title		as title,
+			news_contents	as contents,
+			news_img_path	as imgPath,
+			news_type_no	as "type.newsTypeNo",
+			category_no		as "category.categoryNo",
+			reporter_no		as "reporter.reporterNo",
+			visible			as visible
+		from
+			temporary_news
+		where
+			reporter_no = #value#
+		order by news_no desc
+	</select>
+	
+	<select id="getTemporaryNewsByNo" parameterClass="int" resultClass="temp">
+		select
+			news_no			as "no",
+			news_location	as location,
+			news_title		as title,
+			news_contents	as contents,
+			news_img_path	as imgPath,
+			news_type_no	as "type.newsTypeNo",
+			category_no		as "category.categoryNo",
+			reporter_no		as "reporter.reporterNo",
+			visible			as visible
+		from
+			temporary_news
+		where
+			news_no = #value#
+	</select>
+	
+	<insert id="insertTemporaryNews" parameterClass="temp">
+		insert into temporary_news 
+		(news_no, news_location, news_title, news_contents, news_img_path, news_type_no, category_no, reporter_no, visible)
+		values
+		(SEQ_TEMP.nextval, #location#, #title#, #contents#, #imgPath#, #type.newsTypeNo#, #category.categoryNo#, #reporter.reporterNo#, 'Y')
+	</insert>
+	
+	<delete id="deleteTemporaryNews" parameterClass="int">
+		delete from temporary_news
+		where news_no = #value#
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="crcomments">
+
+	<typeAlias alias="crcomments" type="kr.co.jtimes.citizenrep.comments.vo.CrCommentsVo"/>
+
+	<insert id="addCrComment" parameterClass="crcomments">
+		insert into TB_CITIZEN_COMMENTS (COMMENT_NO, COMMENT_REGDATE, CITIZEN_REPORT_NO, USER_NO, COMMENT_CONTENTS)
+		values (seq_citrep_comments.nextval, sysdate, #citizenRepVo.citizenRepNo#, #userVo.no#, #contents#)
+	</insert>
+	
+	<select id="getAllCommentByCrNo" parameterClass="int" resultClass="crcomments">
+		select
+			A.COMMENT_NO			as no,
+			A.COMMENT_REGDATE		as regDate,
+			A.CITIZEN_REPORT_NO		as "citizenRepVo.citizenRepNo",
+			A.USER_NO				as "userVo.no",
+			A.COMMENT_CONTENTS		as contents,
+			B.USER_ID				as "userVo.id"
+		from 
+			TB_CITIZEN_COMMENTS A, TB_USER B
+		where
+			A.USER_NO = B.USER_NO
+		and
+			CRCMT_ACTIVE = 'Y'
+		and
+			CITIZEN_REPORT_NO = #value#
+	</select>
+	
+	<update id="deleteComment" parameterClass="int">
+		update TB_CITIZEN_COMMENTS set CRCMT_ACTIVE='N'
+		where COMMENT_NO = #value#
+	</update>
+	
+</sqlMap>
